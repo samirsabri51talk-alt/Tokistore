@@ -703,6 +703,10 @@ const APP_CONFIG = {
 const DEMO_USERS = [
   {id:'admin-samir',username:'samir',password:'samir123',name:'Samir',role:'member',team:'HQ'},
   {id:'admin-reem',username:'reem',password:'reem123',name:'Reem',role:'member',team:'HQ'},
+  // The only two administrator profiles.  They need no team assignment because
+  // administrators manage every PK and team from the Admin Portal.
+  {id:'admin-reem01',username:'reem01',name:'Reem',email:'reem01@51talk.com',role:'admin',teams:[]},
+  {id:'admin-ssabry',username:'ssabry',name:'S. Sabry',email:'ssabry@51talk.com',role:'admin',teams:[]},
   {id:'sm-bonny',              username:'bonny',                   password:'sm123', name:'Bonny',                   role:'sm', team:'Floor 8 / Park A-01'},
   {id:'sm-ahmedfou',           username:'egss-ahmedfou',           password:'sm123', name:'EGSS-ahmedfou',           role:'sm', team:'Floor 9'},
   {id:'sm-hussienmo',          username:'egss-hussienmo',          password:'sm123', name:'EGSS-hussienmo',          role:'sm', team:'Park A-03'},

@@ -221,6 +221,37 @@
       .admin-table{font-size:0.8rem}
       .admin-table th,.admin-table td{padding:10px 12px}
     }
+    /* Responsive layout: phones (iOS/Android), tablets, and laptops. */
+    @media(max-width:1100px){
+      .site-header{padding-inline:24px}
+      .nav-pill{padding-inline:14px}
+      .content{padding-inline:24px}
+      .reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:760px){
+      body{padding-bottom:env(safe-area-inset-bottom)}
+      .site-header{height:auto;min-height:60px;padding:8px 16px max(8px,env(safe-area-inset-bottom));gap:8px;flex-wrap:wrap}
+      .brand{min-height:40px}.brand img{max-width:128px;max-height:30px}
+      .header-meta{margin-left:auto;gap:6px}.user-badge{display:none}
+      .logout-btn{min-height:38px;padding:7px 10px;white-space:nowrap}
+      .header-nav{order:3;flex:0 0 100%;width:100%;padding:4px;overflow-x:auto;justify-content:flex-start;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+      .header-nav::-webkit-scrollbar{display:none}.nav-pill{flex:0 0 auto;min-height:38px;padding:8px 14px}
+      .content{padding:28px 16px 56px}
+      .hero{min-height:220px;padding:30px 16px}.hero h1{font-size:clamp(2rem,11vw,2.8rem)}.hero p:not(.eyebrow){font-size:.95rem;max-width:65%}
+      .campaign-list{grid-template-columns:1fr}.campaign-card{padding:18px}
+      .section-heading h2,.rewards-toolbar h2{font-size:1.3rem}.filters input,.filters select{width:100%;flex:1 0 100%}
+      .settings-card{padding:16px}.settings-toolbar,.team-points-toolbar{align-items:stretch}.settings-toolbar>*,.team-points-toolbar>*{width:100%}
+      .admin-table-wrap,.team-points-table-wrap{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+      .admin-table{min-width:860px}.team-points-table{min-width:920px!important}
+      .modal{padding:10px}.modal-panel{width:100%;max-height:calc(100dvh - 20px);border-radius:18px;padding:20px 16px}
+      .pk-header-grid{grid-template-columns:1fr}.reward-editor-row{padding:12px}.save-bar{justify-content:stretch}.save-bar .button{width:100%}
+    }
+    @media(max-width:420px){
+      .site-header{padding-inline:12px}.brand img{max-width:108px}.header-meta #back-login-btn{display:none}
+      .logout-btn{font-size:.73rem;padding-inline:8px}.hero{padding-inline:14px}.hero p:not(.eyebrow){max-width:72%}
+      .stats-grid{grid-template-columns:1fr}.team-select-card{padding:28px 18px}.team-select-overlay{padding:12px}
+    }
+    @media(min-width:761px) and (max-width:1100px){.reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding-bottom:64px}}
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
   /* ===== TEAM SELECTOR ===== */
 .team-select-overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#fff8e5 0%,#fff0c7 50%,#ffe4a1 100%);}

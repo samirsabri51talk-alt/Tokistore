@@ -1834,6 +1834,12 @@ document.onkeydown = e=>{if(e.key==='Escape')closeModal();};
 DB.clearSession();
 async function restoreAuthSession(){
   const saved=DB.getAuthSession(); if(!saved?.accessToken)return;
+  // Restore the known account immediately. Chrome can restore the page before
+  // the network is ready, so waiting for /user here looked like a logout.
+  const cachedProfile=DB.getUsers().find(u=>u.email&&u.email.toLowerCase()===String(saved.email||'').toLowerCase());
+  if(!cachedProfile){DB.clearAuthSession();return;}
+  state.user={...cachedProfile,authToken:saved.accessToken,authUserId:saved.userId};
+  enterApp();
   let auth={access_token:saved.accessToken,user:{id:saved.userId,email:saved.email}};
   let res=await fetch(TOKI_AUTH_URL+'/auth/v1/user',{headers:{apikey:TOKI_AUTH_KEY,Authorization:'Bearer '+saved.accessToken}}).catch(()=>null);
   if(!res?.ok && saved.refreshToken){
@@ -1843,9 +1849,9 @@ async function restoreAuthSession(){
   // Never discard a valid local session simply because the network was briefly unavailable.
   // Clear it only after Supabase has responded and confirmed that both tokens are invalid.
   if(!res)return;
-  if(!res.ok){DB.clearAuthSession();return;}
+  if(!res.ok){logout();return;}
   const profile=DB.getUsers().find(u=>u.email&&u.email.toLowerCase()===String(auth.user?.email||'').toLowerCase());
-  if(!profile){DB.clearAuthSession();return;}
+  if(!profile){logout();return;}
   state.user={...profile,authToken:auth.access_token,authUserId:auth.user?.id}; enterApp();
 }
 

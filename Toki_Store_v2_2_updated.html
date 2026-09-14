@@ -450,6 +450,7 @@
           </div>
           <div class="team-points-toolbar">
             <input id="team-points-search" type="search" placeholder="Search team or SM…">
+            <label for="team-points-pk-filter" style="font-size:.78rem;font-weight:800;color:var(--muted)">PK balance for</label>
             <select id="team-points-pk-filter" aria-label="Select PK"></select>
             <select id="team-points-sm-filter"><option value="">All SMs</option></select>
             <button class="tiny-btn" id="refresh-team-points">Refresh</button>
@@ -942,10 +943,9 @@ const DB = {
   setAuthSession(s){ localStorage.setItem('toki_auth_session',JSON.stringify(s)); },
   clearAuthSession(){ localStorage.removeItem('toki_auth_session'); },
   getSettings(){
-    const teamPoints={}; Object.values(SM_TEAMS).flat().forEach(g=>{teamPoints[g.team]=1000;});
-    const config=structuredClone(APP_CONFIG),defaults={teamPoints,teamPointMeta:{},teamPointsByPk:{},teamPointMetaByPk:{},campaigns:config.campaigns,notifications:{}};
+    const config=structuredClone(APP_CONFIG),defaults={teamPointsByPk:{},teamPointMetaByPk:{},campaigns:config.campaigns,notifications:{}};
     const raw=TokiLS.getItem('toki_settings');
-    if(raw){try{const saved=JSON.parse(raw)||{};const merged={...defaults,...saved};merged.teamPoints={...teamPoints,...(saved.teamPoints||{})};merged.teamPointMeta={...(saved.teamPointMeta||{})};merged.teamPointsByPk=(saved.teamPointsByPk&&typeof saved.teamPointsByPk==='object')?saved.teamPointsByPk:{};merged.teamPointMetaByPk=(saved.teamPointMetaByPk&&typeof saved.teamPointMetaByPk==='object')?saved.teamPointMetaByPk:{};merged.campaigns=Array.isArray(saved.campaigns)?saved.campaigns:config.campaigns;merged.campaigns=merged.campaigns.map(c=>({...c,rewards:Array.isArray(c.rewards)?c.rewards:[]}));return merged;}catch(e){console.warn('Invalid toki_settings; rebuilding defaults.',e);}}
+    if(raw){try{const saved=JSON.parse(raw)||{};const {teamPoints,teamPointMeta,...savedWithoutGeneralPoints}=saved,merged={...defaults,...savedWithoutGeneralPoints};merged.teamPointsByPk=(saved.teamPointsByPk&&typeof saved.teamPointsByPk==='object')?saved.teamPointsByPk:{};merged.teamPointMetaByPk=(saved.teamPointMetaByPk&&typeof saved.teamPointMetaByPk==='object')?saved.teamPointMetaByPk:{};merged.campaigns=Array.isArray(saved.campaigns)?saved.campaigns:config.campaigns;merged.campaigns=merged.campaigns.map(c=>({...c,rewards:Array.isArray(c.rewards)?c.rewards:[]}));return merged;}catch(e){console.warn('Invalid toki_settings; rebuilding defaults.',e);}}
     TokiLS.setItem('toki_settings',JSON.stringify(defaults));return defaults;
   },
   setSettings(v){ TokiLS.setItem('toki_settings',JSON.stringify(v)); },

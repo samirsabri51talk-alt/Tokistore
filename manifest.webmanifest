@@ -1,0 +1,15 @@
+{
+  "name": "Toki Store",
+  "short_name": "Toki Store",
+  "description": "Toki Store PK rewards portal",
+  "start_url": "./Toki_Store_v2_2_updated.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff8e5",
+  "theme_color": "#ff7900",
+  "orientation": "any",
+  "icons": [
+    {"src": "assets/toki-app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "assets/toki-app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

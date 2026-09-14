@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Toki Store PK rewards portal">
+  <meta name="theme-color" content="#ff7900">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Toki Store">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/toki-app-icon-192.png">
   <title>Toki Store | PK Rewards</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1784,6 +1790,7 @@ renderCampaigns();
 renderRewards();
 restoreAuthSession();
 window.addEventListener('online', restoreAuthSession);
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Offline app support unavailable.',e))); }
 </script>
 
 <script type="module">

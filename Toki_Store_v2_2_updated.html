@@ -929,6 +929,7 @@ const TokiCloud = {
   online: false,
   _timer: null,
   _pulling: false,
+  _flushPromise: null,
   _dirty: new Set(),
   isShared(k){ return TOKI_SHARED_KEYS.indexOf(k) !== -1; },
   /* Blocking first load so the app boots with the shared data already in hand. */
@@ -959,18 +960,22 @@ const TokiCloud = {
   remove(k){ delete this.cache[k]; this._mirror(); },
   _flushSoon(){ clearTimeout(this._timer); this._timer = setTimeout(()=>this.flush(), 120); },
   async flush(){
+    if(this._flushPromise) return this._flushPromise;
     if(!this._dirty.size) return;
     const rows = [...this._dirty].map(k=>({ key:k, value:this.cache[k], updated_at:new Date().toISOString() }));
     this._dirty.clear();
-    try{
-      const res = await fetch(TOKI_REST + '?on_conflict=key', {
-        method:'POST',
-        headers:{ 'apikey':TOKI_CLOUD_KEY, 'Authorization':'Bearer '+TOKI_CLOUD_KEY, 'Content-Type':'application/json', 'Prefer':'resolution=merge-duplicates,return=minimal' },
-        body: JSON.stringify(rows)
-      });
-      if(!res.ok){ console.error('Toki Cloud save failed', res.status, await res.text()); rows.forEach(r=>this._dirty.add(r.key)); }
-      else { this.online = true; this._badge(); }
-    }catch(e){ console.error('Toki Cloud save failed', e); rows.forEach(r=>this._dirty.add(r.key)); }
+    this._flushPromise=(async()=>{
+      try{
+        const res = await fetch(TOKI_REST + '?on_conflict=key', {
+          method:'POST',
+          headers:{ 'apikey':TOKI_CLOUD_KEY, 'Authorization':'Bearer '+TOKI_CLOUD_KEY, 'Content-Type':'application/json', 'Prefer':'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify(rows)
+        });
+        if(!res.ok){ console.error('Toki Cloud save failed', res.status, await res.text()); rows.forEach(r=>this._dirty.add(r.key)); }
+        else { this.online = true; this._badge(); }
+      }catch(e){ console.error('Toki Cloud save failed', e); rows.forEach(r=>this._dirty.add(r.key)); }
+    })();
+    try{ await this._flushPromise; }finally{ this._flushPromise=null; }
   },
   applyRemote(key, value){
     if(typeof value !== 'string') return;
@@ -1049,6 +1054,21 @@ const DB = {
 };
 TokiCloud.hydrate();
 DB.init();
+/* A purchase is never shown as sent until its record has round-tripped through
+   the shared database. This prevents a fast refresh/close from losing it. */
+async function savePurchaseRequest(payload){
+  await TokiCloud.pull();
+  const orders=DB.getSubs();
+  if(!orders.some(order=>order.id===payload.id)){
+    orders.unshift(payload);
+    DB.setSubs(orders);
+  }
+  await TokiCloud.flush();
+  await TokiCloud.pull();
+  if(!DB.getSubs().some(order=>order.id===payload.id)){
+    throw new Error('The purchase request was not confirmed by the shared database.');
+  }
+}
 function populateForgotUsers(){
   const select=$('#forgot-crm');
   if(!select)return;
@@ -1494,7 +1514,7 @@ function openReview(){
   $('#confirm').onclick = submitReward;
 }
 
-function submitReward(){
+async function submitReward(){
   if(state.submitting) return;
   state.submitting=true;
   const btn=$('#confirm'); btn.disabled=true; btn.textContent='Submitting...';
@@ -1514,7 +1534,7 @@ function submitReward(){
   const refId='TOKI-'+now.getTime().toString(36).toUpperCase();
   const sm=allKnownTeams().find(x=>x.team===team)?.sm || state.user?.name || 'Unknown';
   const payload={id:refId,pkId:c.id,pkName:c.name,month:c.month,crmName:state.form.crmName,teamName:team,rewardId:r.id,rewardName:r.name,quantity:state.form.quantity,unitPoints:Number(state.form.unitPoints),points:state.form.totalPoints,category:r.category||'',restaurant:state.form.restaurant||'',foodItem:state.form.foodItem||'',size:state.form.size||'',clientDate:state.form.clientDate,submittedBy:state.user?.name||'Guest',submittedByRole:state.user?.role||'agent',smName:sm,timestamp:now.toISOString(),status:'Pending',declineReason:'',approvedAt:null,declinedAt:null};
-  try{ const subs=DB.getSubs(); subs.unshift(payload); DB.setSubs(subs); notifySM(payload.smName,{title:'Purchase pending',teamName:payload.teamName,message:'Your Toki Store purchase '+payload.id+' for '+payload.quantity+' × '+payload.rewardName+' ('+payload.points+' points) is pending admin review.'}); showSuccess(payload); }
+  try{ await savePurchaseRequest(payload); notifySM(payload.smName,{title:'Purchase pending',teamName:payload.teamName,message:'Your Toki Store purchase '+payload.id+' for '+payload.quantity+' × '+payload.rewardName+' ('+payload.points+' points) is pending admin review.'}); showSuccess(payload); }
   catch(err){ console.error(err); $('#submit-error').textContent='We could not record the purchase request. Please try again.'; btn.disabled=false; btn.textContent='Place purchase request'; state.submitting=false; }
 }
 function showSuccess(data){

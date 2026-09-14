@@ -332,6 +332,50 @@
 .team-select-card .mascot-art{width:120px;}
 .modal-panel .mascot-art{width:118px;margin-bottom:6px;}
 @media(max-width:760px){.admin-hero{gap:16px}.admin-hero .admin-hero-art{width:110px}}
+
+/* Phone-first safeguards: keep the navigation, forms and long team names inside
+   the viewport on iOS and Android, including narrow 320 px devices. */
+@media(max-width:760px){
+  html{overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{min-width:0;overflow-x:hidden;}
+  .login-page,.team-select-overlay{min-height:100dvh;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));}
+  .login-card{border-radius:18px;width:100%;min-width:0;padding:32px 20px;overflow:hidden;}
+  .login-card .subtitle,.login-card .hint{max-width:100%;overflow-wrap:anywhere;}
+  .login-card input,.login-card select{min-width:0;}
+  .site-header{top:0;padding-top:max(8px,env(safe-area-inset-top));align-items:center;}
+  .brand{min-width:0;flex:1 1 auto;}.brand img{width:auto;max-width:112px;}
+  .header-meta{flex:0 0 auto;min-width:0;gap:5px;}
+  #back-login-btn{display:none;}
+  #refresh-btn{width:38px;min-width:38px;padding:0;font-size:0;display:grid;place-items:center;}
+  #refresh-btn::before{content:'↻';font-size:1.25rem;line-height:1;}
+  #logout-btn{padding-inline:10px;}
+  #switch-team-btn{max-width:92px;overflow:hidden;text-overflow:ellipsis;margin-right:0!important;}
+  .header-nav{scroll-snap-type:x proximity;}
+  .nav-pill{scroll-snap-align:start;}
+  input,select,textarea{font-size:16px!important;max-width:100%;}
+  button,.button,.logout-btn,.export-btn,.action-btn,.tiny-btn{min-height:40px;touch-action:manipulation;}
+  .hero{min-height:210px;}.hero-copy{max-width:72%;}
+  .hero p:not(.eyebrow){max-width:none;}.hero-meta{gap:6px;}
+  .hero-meta .badge{max-width:100%;overflow-wrap:anywhere;}
+  .admin-hero{padding:26px 16px;}.admin-hero .admin-hero-copy{min-width:0;flex-basis:0;}
+  .admin-hero p,.section-note,.description,.notice-body,.receipt strong{overflow-wrap:anywhere;}
+  .section-heading,.rewards-toolbar,.team-points-admin-head{gap:12px;}
+  .campaign-card,.reward-body,.stat-card{padding:16px;}
+  .reward-footer{align-items:stretch;flex-wrap:wrap;}.reward-footer .button{width:100%;}
+  .modal{align-items:end;padding:0;}.modal-panel{border-radius:20px 20px 0 0;max-height:90dvh;padding:20px 16px max(20px,env(safe-area-inset-bottom));}
+  .modal-reward{align-items:flex-start;}.modal-reward img{width:60px;height:60px;}
+  .receipt{padding:14px;}.receipt p{overflow-wrap:anywhere;}
+  .admin-filters input,.admin-filters select,.team-points-toolbar input,.team-points-toolbar select{width:100%;min-width:0;}
+  .settings-card{max-width:100%;}.settings-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .admin-table-wrap,.team-points-table-wrap{position:relative;overscroll-behavior-x:contain;}
+  .admin-table-wrap::after,.team-points-table-wrap::after{content:'Swipe to see all columns';display:block;padding:7px 12px;background:#fff8e5;color:#765000;font-size:.72rem;font-weight:700;}
+}
+@media(max-width:390px){
+  .site-header{padding-inline:10px;}.brand img{max-width:92px;}
+  #logout-btn{font-size:.72rem;padding-inline:8px;}#switch-team-btn{display:none;}
+  .content{padding-inline:12px;}.hero{padding-inline:12px;}.hero-copy{max-width:68%;}
+  .stats-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -377,7 +421,7 @@
         <div class="user-avatar" id="user-avatar">U</div>
         <span id="user-name">User</span>
       </div>
-      <button class="logout-btn" id="refresh-btn" type="button" title="Refresh live data">↻ Refresh</button>
+      <button class="logout-btn" id="refresh-btn" type="button" title="Refresh live data" aria-label="Refresh live data">↻ Refresh</button>
       <button class="logout-btn" id="logout-btn">Logout</button>
     </div>
   </header>

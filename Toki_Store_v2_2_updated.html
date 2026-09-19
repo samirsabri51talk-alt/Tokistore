@@ -743,6 +743,22 @@ const APP_CONFIG = {
   ]
 };
 
+/* Screenshot-sourced Beauty rewards.  These use local project assets so the
+   catalog remains available on GitHub Pages without external image hosts. */
+const BEAUTY_REWARDS = [
+  {id:'guess-marciano-men-001',name:'Guess By Marciano for Men Eau de Toilette',description:'Guess fragrance, 100 ml.',points:1676,category:'Beauty',hidden:false,image:'assets/rewards/guess-marciano-men.jpg',stock:null},
+  {id:'guess-marciano-women-001',name:'Guess By Marciano for Women Eau de Parfum',description:'Guess fragrance, 100 ml.',points:1872,category:'Beauty',hidden:false,image:'assets/rewards/guess-marciano-women.jpg',stock:null},
+  {id:'guess-girl-rose-001',name:'Guess Girl Rose Eau de Toilette',description:'Guess fragrance, 100 ml.',points:1872,category:'Beauty',hidden:false,image:'assets/rewards/guess-girl-rose.jpg',stock:null},
+  {id:'guess-gold-women-001',name:'Guess Gold for Women Eau de Parfum',description:'Guess fragrance, 75 ml.',points:1832,category:'Beauty',hidden:false,image:'assets/rewards/guess-gold-women.jpg',stock:null},
+  {id:'guess-seductive-women-001',name:'Guess Seductive for Women Eau de Toilette',description:'Guess fragrance, 75 ml.',points:1832,category:'Beauty',hidden:false,image:'assets/rewards/guess-seductive-women.jpg',stock:null},
+  {id:'guess-seductive-noir-001',name:'Guess Seductive Noir Eau de Toilette',description:'Guess fragrance, 75 ml.',points:1832,category:'Beauty',hidden:false,image:'assets/rewards/guess-seductive-noir.jpg',stock:null}
+];
+const defaultBeautyCampaign = APP_CONFIG.campaigns.find(c=>c.id==='upgrade-pk-aug');
+if(defaultBeautyCampaign){
+  defaultBeautyCampaign.rewards = defaultBeautyCampaign.rewards || [];
+  BEAUTY_REWARDS.forEach(reward=>{ if(!defaultBeautyCampaign.rewards.some(existing=>existing.id===reward.id)) defaultBeautyCampaign.rewards.push(reward); });
+}
+
 /* ===== AUTH & USERS ===== */
 const DEMO_USERS = [
   {id:'admin-samir',username:'samir',password:'samir123',name:'Samir',role:'member',team:'HQ'},

@@ -760,6 +760,8 @@ if(defaultBeautyCampaign){
   defaultBeautyCampaign.rewards = defaultBeautyCampaign.rewards || [];
   BEAUTY_REWARDS.forEach(reward=>{ if(!defaultBeautyCampaign.rewards.some(existing=>existing.id===reward.id)) defaultBeautyCampaign.rewards.push(reward); });
 }
+const defaultMealReward = APP_CONFIG.campaigns.flatMap(c=>c.rewards||[]).find(reward=>reward.id==='meal-001');
+if(defaultMealReward) defaultMealReward.image='assets/rewards/pizza-hut.png';
 
 /* ===== AUTH & USERS ===== */
 const DEMO_USERS = [

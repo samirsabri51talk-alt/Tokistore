@@ -78,6 +78,8 @@
     .content{max-width:1280px;margin:auto;padding:40px max(5vw,28px) 72px;}
     .section-heading,.rewards-toolbar{display:flex;justify-content:space-between;gap:20px;align-items:end;}
     .section-heading h2,.rewards-toolbar h2{font-size:1.5rem;letter-spacing:-.04em;margin:.2rem 0 1.2rem;font-weight:800;}
+    .cart-button{border:0;border-radius:999px;background:var(--ink);color:#fff;font:inherit;font-weight:800;padding:11px 16px;white-space:nowrap;cursor:pointer;}
+    .cart-button:disabled{opacity:.55;cursor:not-allowed;}
     .campaign-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
     .campaign-card{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:22px;box-shadow:0 4px 12px rgba(15,23,42,.03);text-align:left;cursor:pointer;transition:.2s;border-left:4px solid transparent;}
     .campaign-card:hover,.campaign-card.active{border-color:#ffc126;border-left-color:var(--orange);transform:translateY(-3px);box-shadow:var(--shadow);}
@@ -473,6 +475,7 @@
               <option value="za">Z&ndash;A</option>
             </select>
           </div>
+          <button id="cart-button" class="cart-button" type="button">Cart (0)</button>
         </div>
         <div id="reward-list" class="reward-grid" aria-live="polite"></div>
       </section>
@@ -762,6 +765,33 @@ if(defaultBeautyCampaign){
 }
 const defaultMealReward = APP_CONFIG.campaigns.flatMap(c=>c.rewards||[]).find(reward=>reward.id==='meal-001');
 if(defaultMealReward) defaultMealReward.image='assets/rewards/pizza-hut.png';
+
+/* Catalog items supplied by the store screenshots. Every displayed price has
+   the requested 50 EGP service allowance added (1 point = 1 EGP). */
+const SCREENSHOT_CATALOG = [
+  ['01','Personal Care',['Joviality Tropical Glow Shimmering Dry Oil','Nivea Sun Kids Swim & Play Lotion SPF50','Nivea Sun Moisturising After Sun Lotion','Nivea Sun Moisturising Protection SPF30','Nivea Sun Moisturising Sun Lotion SPF50','True Baby & Kids Sunscreen Cream Spray'],[469,950,650,650,950,920]],
+  ['02','Personal Care',['Gliss Oil Nutritive Shampoo','Gliss Ultimate Repair Shampoo','Gliss Total Repair Shampoo','Braes Volumizing Shampoo','Bubblzz Kids Shampoo 325 ml','Bubblzz Moisture Lock Shampoo'],[180,110,180,362,228,271]],
+  ['03','Personal Care',['Clary Antidandruff Shampoo','Clary Shampoo for Dry & Damaged Hair','Clear Anti Dandruff 2IN1 Anti Hair Fall','Clear Anti Hair Fall Anti-Dandruff Shampoo','Clear Cool Sport Shampoo for Men','Clear Deep Cleanse Anti-Dandruff Shampoo'],[351,340,254,164,253,226]],
+  ['04','Skin Care',['CeraVe Foaming Cleanser','CeraVe Moisturizing Lotion','Cosrx The Retinol 0.1 Cream','Cosrx The Retinol 0.3 Cream','Dermacy Acne-Prone Serum','Dermacy Acne-Prone Toner'],[746,704,1060,1042,578,473]],
+  ['05','Skin Care',['Anua Heartleaf 77% Soothing Toner','Anua Heartleaf Pore Control Cleansing Oil','Centella Skin1004 Madagascar Ampoule','Centella Skin1004 Hyalu Cica Blue Serum','Centella Skin1004 Hyalu Cica First Ampoule','CeraVe AM Facial Lotion SPF 25'],[1550,1596,1262,1146,1434,590]],
+  ['06','Personal Care',['Clear Shampoo Women Soft & Shiny','Dove Hair Fall Shampoo for Women','Dove Shampoo Daily Care','Dove Shampoo Nourishing Oil Care','Dove Shampoo Strengthening Ritual','Eva Advanced Care Clinic Lengthening Shampoo'],[150,150,201,205,161,166.5]],
+  ['07','Personal Care',['Clear Men Anti-Dandruff Shampoo Hair Fall','Clear Men Deep Cleanse Control Shampoo','Clear Men Vini Anti-Dandruff Shampoo','Clear Men Vini Anti-Dandruff Shampoo Deep Clean','Clear Shampoo Hair Fall Defense','Clear Shampoo Women Anti-Hair Fall'],[253,150,211,253,177,82.5]],
+  ['08','Skin Care',['Dermacy Anti Wrinkle Serum','Dermacy Eye Cream','Dermacy Face Cream','Dermacy Foaming Face Cleanser','Dermacy Glowy Booster Serum','Dermacy Moisturizing Milky Toner'],[592,457,610,424,558,473]],
+  ['09','Games & Gifts',['Eftah Topic Tell Us (Ehkina)','Eftah Topic What If (Law)','Nilco Chess Show Box Carton','Nilco El Koz','Nilco Mafia','Nilco Premium Colorful Playing Cards'],[150,150,546,295,295,227.5]],
+  ['10','Skin Care',['La Roche Posay Anthelios Anti-Shining','La Roche Posay Anthelios Moisturizing Sunscreen','La Roche Posay Anthelios Dry Touch Sunscreen','La Roche Posay Anthelios Sunscreen','La Roche Posay Retinol Serum All Skins','La Roche Posay Cicaplast Moisturizing Cream'],[820,1196,1122,1122,1584,928]],
+  ['11','Games & Gifts',['Nilco Four In A Row','Nilco Plastic Box Bank El Hazz Deal','Nilco Plastic Box Golden Playing Cards','Nilco Playing Cards','Nilco Playing Cards 2 in 1','Nilco Rings Up'],[275,250,149,54,85,368]],
+  ['12','Games & Gifts',['Nilco Sequence Deluxe','Nilco Tottery Tower','Eftah Topic Bundle','Eftah Topic Don’t Twist the Truth','Eftah Topic Part 1','Eftah Topic Part 2'],[1038,285,690,150,150,150]],
+  ['13','Stationery',['Bravo Mini Notebook with Pen','CAPYBARA Holographic Hardcover Notebook A','CAPYBARA Holographic Hardcover Notebook B','CAPYBARA Holographic Hardcover Notebook C','CAPYBARA Holographic Hardcover Notebook D','Chocolate Shaped Notebook'],[45,266,266,266,266,116.5]],
+  ['14','Stationery',['Mintra Hardcover Notebook B5','Mintra Hardcover Notebook B6','Mintra Notebook 24 Sheets – Random','Notte Hardcover A4 Sketchbook','Notte Hardcover A5 Sketchbook','Notte Large A4 Drawing Pad'],[79,445,31,718,434,91]]
+];
+const defaultCatalogCampaign=APP_CONFIG.campaigns.find(c=>c.id==='upgrade-pk-aug');
+if(defaultCatalogCampaign){
+  defaultCatalogCampaign.rewards=defaultCatalogCampaign.rewards||[];
+  SCREENSHOT_CATALOG.forEach(([shot,category,names,prices])=>names.forEach((name,index)=>{
+    const id='catalog-'+shot+'-'+String(index+1).padStart(2,'0');
+    if(!defaultCatalogCampaign.rewards.some(existing=>existing.id===id)) defaultCatalogCampaign.rewards.push({id,name,description:'Catalog reward · price includes 50 EGP.',points:Number(prices[index])+50,category,hidden:false,image:'assets/rewards/catalog/catalog-'+shot+'.png',stock:null});
+  }));
+}
 
 /* ===== AUTH & USERS ===== */
 const DEMO_USERS = [
@@ -1111,6 +1141,7 @@ const state = {
   campaign:null,
   reward:null,
   form:null,
+  cart:[],
   submitting:false,
   previousFocus:null
 };
@@ -1369,6 +1400,7 @@ function renderRewards(){
   $('#selected-month').textContent = c.month + ' · ' + pkStatus(c);
   const categories = [...new Set(visibleRewardsOf(c).map(r=>r.category).filter(Boolean))];
   $('#category').innerHTML = '<option value="">All categories</option>' + categories.map(x=>'<option>'+esc(x)+'</option>').join('');
+  updateCartButton();
   applyFilters();
 }
 
@@ -1414,7 +1446,7 @@ function applyFilters(){
     const availableStock=rewardHasLimitedStock(reward)?Math.max(0,Number(reward.stock)-pendingRewardQuantity(c.id,reward.id)):null;
     const stockText = availableStock!==null&&availableStock>0?' · '+availableStock+' remaining':'';
     card.querySelector('.description').textContent = reward.description + stockText;
-    card.querySelector('.points').textContent = reward.points+' Points / EGP';
+    card.querySelector('.points').textContent = rewardType(reward)==='meal'?'Choose your price':' '+reward.points+' Points / EGP';
     const button = card.querySelector('button');
     if(!pkIsLive(c)){
       button.textContent = pkStatus(c)==='Scheduled' ? 'Not started yet' : 'PK ended';
@@ -1563,6 +1595,31 @@ function showSuccess(data){
 }
 
 /* ===== ADMIN PORTAL ===== */
+/* ===== CART CHECKOUT ===== */
+function cartTotal(){return state.cart.reduce((sum,item)=>sum+Number(item.totalPoints||0),0);}
+function updateCartButton(){const button=$('#cart-button');if(!button)return;button.textContent='Cart ('+state.cart.length+')';button.onclick=openCart;}
+function cartContext(){return state.cartContext||null;}
+function addToCart(item){state.cart.push(item);state.cartContext={crmName:item.crmName,teamName:item.teamName};updateCartButton();}
+function openForm(reward){
+  if(!pkIsLive(state.campaign)){alert('This PK is '+pkStatus(state.campaign).toLowerCase()+'. Purchases are closed.');return;}
+  const saved=cartContext(), type=rewardType(reward), teams=isAdmin()?allKnownTeams().map(x=>x.team):(state.selectedTeam?[state.selectedTeam]:userTeams(state.user));
+  const teamOptions=teams.map(t=>'<option value="'+esc(t)+'" '+(saved?.teamName===t?'selected':'')+'>'+esc(t)+'</option>').join('');
+  const meal=type==='meal'?'<div class="meal-restaurant-choice"><label>Restaurant / Store<input name="restaurant" list="meal-restaurants" required><datalist id="meal-restaurants"><option value="Pizza Hut"></option></datalist></label><img src="assets/rewards/pizza-hut.png" alt="Pizza Hut" class="meal-brand-logo"></div><label>Food / Item<input name="foodItem" required></label><label>Food price (EGP)<input name="foodPrice" type="number" min="1" step="1" placeholder="You choose the price" required></label>':'';
+  const sizes=type==='tshirt'?'<label>T-Shirt size<select name="size" required>'+shirtSizes().map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select></label>':'';
+  openModal('<h2 id="modal-title">Add to cart</h2>'+rewardPreview(reward)+'<form id="reward-form" novalidate><div class="form-grid"><label>CRM Name<input name="crmName" value="'+esc(saved?.crmName||'')+'" required></label><label>Select Team<select name="teamName" required><option value="">-- Choose a team --</option>'+teamOptions+'</select></label>'+meal+sizes+'<label>Quantity<input name="quantity" type="number" min="1" step="1" value="1" required></label></div><div class="purchase-summary"><span id="purchase-summary-text">Price shown in points / EGP</span><strong id="purchase-total">'+Number(reward.points).toLocaleString()+' Points</strong></div><p class="team-points-note">Meal Voucher has no fixed value: choose the food price. 1 point = 1 EGP.</p><p class="error" id="form-error" role="alert"></p><div class="modal-actions"><button class="button secondary" type="button" data-close>Cancel</button><button class="button" type="submit">Add to cart</button></div></form>');
+  const form=$('#reward-form'),quantity=form.quantity,price=form.foodPrice;
+  const refresh=()=>{const unit=type==='meal'?Math.max(0,Number(price?.value)||0):Number(reward.points),total=unit*Math.max(1,Number(quantity.value)||1);$('#purchase-summary-text').textContent=Math.max(1,Number(quantity.value)||1)+' item(s) × '+unit.toLocaleString()+' EGP';$('#purchase-total').textContent=total.toLocaleString()+' Points / EGP';};quantity.oninput=refresh;if(price)price.oninput=refresh;
+  form.onsubmit=e=>{e.preventDefault();const fd=new FormData(form),crm=String(fd.get('crmName')||'').trim(),team=String(fd.get('teamName')||'').trim(),qty=Number(fd.get('quantity')),restaurant=String(fd.get('restaurant')||'').trim(),foodItem=String(fd.get('foodItem')||'').trim(),size=String(fd.get('size')||'').trim(),unit=type==='meal'?Number(fd.get('foodPrice')):Number(reward.points);const error=$('#form-error');if(!crm||!team||!Number.isInteger(qty)||qty<1){error.textContent='Enter the CRM name, team, and a whole quantity.';return;}if(saved&&(saved.crmName!==crm||saved.teamName!==team)){error.textContent='All cart items must use the same CRM name and team. Start a new cart or use '+saved.teamName+'.';return;}if(type==='meal'&&(!restaurant||!foodItem||!Number.isFinite(unit)||unit<1)){error.textContent='Choose the restaurant, food item, and price.';return;}const total=unit*qty,available=getTeamPoints(team,state.campaign.id)-DB.getSubs().filter(o=>o.pkId===state.campaign.id&&teamKey(o.teamName)===teamKey(team)&&o.status==='Pending').reduce((s,o)=>s+Number(o.points||0),0);const projected=cartTotal()+total;if(projected>available){error.textContent='Your cart is '+(projected-available).toLocaleString()+' points over the available limit. Remove item(s) worth at least '+(projected-available).toLocaleString()+' points to continue.';return;}addToCart({rewardId:reward.id,rewardName:reward.name,category:reward.category||'',quantity:qty,unitPoints:unit,totalPoints:total,restaurant,foodItem,size,crmName:crm,teamName:team});closeModal();openCart();};
+}
+function openCart(){
+  updateCartButton();
+  if(!state.cart.length){openModal('<h2 id="modal-title">Your cart</h2><p>Your cart is empty. Add rewards, then submit them together as one order.</p><div class="modal-actions"><button class="button" data-close>Done</button></div>');return;}
+  const c=state.campaign,ctx=cartContext(),available=getTeamPoints(ctx.teamName,c.id)-DB.getSubs().filter(o=>o.pkId===c.id&&teamKey(o.teamName)===teamKey(ctx.teamName)&&o.status==='Pending').reduce((s,o)=>s+Number(o.points||0),0),total=cartTotal(),over=Math.max(0,total-available);
+  openModal('<h2 id="modal-title">Your cart</h2><p>All items will be sent together as one purchase request.</p><div class="receipt">'+state.cart.map((item,i)=>'<p><span>'+esc(item.rewardName)+' × '+item.quantity+'</span><strong>'+Number(item.totalPoints).toLocaleString()+' points <button type="button" class="action-btn danger-btn" data-remove-cart="'+i+'">Remove</button></strong></p>').join('')+'<p><span>Total</span><strong>'+total.toLocaleString()+' points</strong></p><p><span>Available</span><strong>'+available.toLocaleString()+' points</strong></p></div>'+(over?'<p class="error">Over the limit by '+over.toLocaleString()+' points. Remove item(s) worth at least '+over.toLocaleString()+' points.</p>':'<p class="team-points-note">Ready to submit one combined order.</p>')+'<p class="error" id="cart-error"></p><div class="modal-actions"><button class="button secondary" data-close>Keep shopping</button><button class="button" id="submit-cart" '+(over?'disabled':'')+'>Send one order</button></div>');
+  $$('[data-remove-cart]').forEach(button=>button.onclick=()=>{state.cart.splice(Number(button.dataset.removeCart),1);if(!state.cart.length)state.cartContext=null;updateCartButton();openCart();});
+  $('#submit-cart').onclick=submitCart;
+}
+async function submitCart(){if(state.submitting)return;const c=state.campaign,ctx=cartContext(),total=cartTotal(),available=getTeamPoints(ctx.teamName,c.id)-DB.getSubs().filter(o=>o.pkId===c.id&&teamKey(o.teamName)===teamKey(ctx.teamName)&&o.status==='Pending').reduce((s,o)=>s+Number(o.points||0),0);if(total>available){$('#cart-error').textContent='Remove item(s) worth at least '+(total-available).toLocaleString()+' points.';return;}state.submitting=true;const now=new Date(),sm=allKnownTeams().find(x=>x.team===ctx.teamName)?.sm||state.user?.name||'Unknown',payload={id:'TOKI-'+now.getTime().toString(36).toUpperCase(),pkId:c.id,pkName:c.name,month:c.month,crmName:ctx.crmName,teamName:ctx.teamName,rewardId:'cart',rewardName:'Cart ('+state.cart.length+' items)',quantity:state.cart.length,unitPoints:total,points:total,category:'Cart',items:structuredClone(state.cart),submittedBy:state.user?.name||'Guest',submittedByRole:state.user?.role||'agent',smName:sm,timestamp:now.toISOString(),status:'Pending',declineReason:'',approvedAt:null,declinedAt:null};try{await savePurchaseRequest(payload);notifySM(sm,{title:'Cart order pending',teamName:ctx.teamName,message:'Toki Store cart order '+payload.id+' ('+total+' points) is pending review.'});state.cart=[];state.cartContext=null;updateCartButton();showSuccess(payload);}catch(e){state.submitting=false;$('#cart-error').textContent='We could not save the cart order. Please try again.';}}
 function posClass(p){
   return 'pos-'+p.replace(/\s+/g,'');
 }
@@ -1657,7 +1714,8 @@ function setOrderPending(id){
 function viewOrder(id){
   const order=DB.getSubs().find(o=>o.id===id); if(!order) return;
   const quantity=Math.max(1,Number(order.quantity||1));
-  openModal('<h2 id="modal-title">Purchase request</h2><div class="receipt"><p><span>Reference</span><strong>'+esc(order.id)+'</strong></p><p><span>CRM</span><strong>'+esc(order.crmName)+'</strong></p><p><span>Team</span><strong>'+esc(order.teamName)+'</strong></p><p><span>Reward</span><strong>'+esc(order.rewardName)+'</strong></p>'+(order.restaurant?'<p><span>Restaurant / Store</span><strong>'+esc(order.restaurant)+'</strong></p>':'')+(order.foodItem?'<p><span>Food / Item</span><strong>'+esc(order.foodItem)+'</strong></p>':'')+(order.size?'<p><span>T-Shirt size</span><strong>'+esc(order.size)+'</strong></p>':'')+'<p><span>Quantity</span><strong>'+quantity+'</strong></p><p><span>Total</span><strong>'+Number(order.points||0).toLocaleString()+' EGP / Points</strong></p><p><span>Status</span><strong>'+esc(order.status)+'</strong></p>'+(order.declineReason?'<p><span>Decline reason</span><strong>'+esc(order.declineReason)+'</strong></p>':'')+'</div><form id="order-invoice-form" class="pk-header-grid" style="margin-top:16px"><label>Store / supplier name<input name="invoiceStore" maxlength="120" value="'+esc(order.invoiceStore||'')+'" placeholder="Add manually"></label><label>Commercial Registration<input name="invoiceCommercialRegistration" maxlength="120" value="'+esc(order.invoiceCommercialRegistration||'')+'" placeholder="Add manually"></label><label>Tax ID<input name="invoiceTaxId" maxlength="120" value="'+esc(order.invoiceTaxId||'')+'" placeholder="Add manually"></label><div class="save-bar" style="grid-column:1/-1"><button class="button secondary" type="submit">Save Invoice Details</button></div></form><div class="modal-actions"><button class="button secondary" id="invoice-btn">Download Invoice PDF</button><button class="button" data-close>Done</button></div>');
+  const cartRows=Array.isArray(order.items)?order.items.map(item=>'<p><span>'+esc(item.rewardName)+' × '+Math.max(1,Number(item.quantity||1))+'</span><strong>'+Number(item.totalPoints||0).toLocaleString()+' EGP / Points</strong></p>').join(''):'';
+  openModal('<h2 id="modal-title">Purchase request</h2><div class="receipt"><p><span>Reference</span><strong>'+esc(order.id)+'</strong></p><p><span>CRM</span><strong>'+esc(order.crmName)+'</strong></p><p><span>Team</span><strong>'+esc(order.teamName)+'</strong></p><p><span>Reward</span><strong>'+esc(order.rewardName)+'</strong></p>'+cartRows+(order.restaurant?'<p><span>Restaurant / Store</span><strong>'+esc(order.restaurant)+'</strong></p>':'')+(order.foodItem?'<p><span>Food / Item</span><strong>'+esc(order.foodItem)+'</strong></p>':'')+(order.size?'<p><span>T-Shirt size</span><strong>'+esc(order.size)+'</strong></p>':'')+'<p><span>Quantity</span><strong>'+quantity+'</strong></p><p><span>Total</span><strong>'+Number(order.points||0).toLocaleString()+' EGP / Points</strong></p><p><span>Status</span><strong>'+esc(order.status)+'</strong></p>'+(order.declineReason?'<p><span>Decline reason</span><strong>'+esc(order.declineReason)+'</strong></p>':'')+'</div><form id="order-invoice-form" class="pk-header-grid" style="margin-top:16px"><label>Store / supplier name<input name="invoiceStore" maxlength="120" value="'+esc(order.invoiceStore||'')+'" placeholder="Add manually"></label><label>Commercial Registration<input name="invoiceCommercialRegistration" maxlength="120" value="'+esc(order.invoiceCommercialRegistration||'')+'" placeholder="Add manually"></label><label>Tax ID<input name="invoiceTaxId" maxlength="120" value="'+esc(order.invoiceTaxId||'')+'" placeholder="Add manually"></label><div class="save-bar" style="grid-column:1/-1"><button class="button secondary" type="submit">Save Invoice Details</button></div></form><div class="modal-actions"><button class="button secondary" id="invoice-btn">Download Invoice PDF</button><button class="button" data-close>Done</button></div>');
   $('#order-invoice-form').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.currentTarget),subs=DB.getSubs(),record=subs.find(o=>o.id===order.id);if(!record)return;record.invoiceStore=String(fd.get('invoiceStore')||'').trim();record.invoiceCommercialRegistration=String(fd.get('invoiceCommercialRegistration')||'').trim();record.invoiceTaxId=String(fd.get('invoiceTaxId')||'').trim();Object.assign(order,record);DB.setSubs(subs);renderOrdersTable();alert('Invoice details saved for this order.');};
   $('#invoice-btn').onclick=()=>downloadInvoicePdf(order);
 }

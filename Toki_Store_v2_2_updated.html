@@ -802,7 +802,7 @@ if(defaultCatalogCampaign){
   defaultCatalogCampaign.rewards=defaultCatalogCampaign.rewards||[];
   SCREENSHOT_CATALOG.forEach(([shot,category,names,prices])=>names.forEach((name,index)=>{
     const id='catalog-'+shot+'-'+String(index+1).padStart(2,'0');
-    if(!defaultCatalogCampaign.rewards.some(existing=>existing.id===id)) defaultCatalogCampaign.rewards.push({id,name,description:'Catalog reward · price includes 50 EGP.',points:Number(prices[index])+50,category,hidden:false,image:CATALOG_IMAGE_OVERRIDES[id]||'assets/rewards/catalog/items/'+id+'.png',stock:null});
+    if(!defaultCatalogCampaign.rewards.some(existing=>existing.id===id)) defaultCatalogCampaign.rewards.push({id,name,description:'Catalog reward · price includes 50 EGP.',points:Number(prices[index])+50,category,hidden:false,image:CATALOG_IMAGE_OVERRIDES[id]||'',stock:null});
   }));
 }
 
@@ -1447,11 +1447,12 @@ function applyFilters(){
     const node = template.content.cloneNode(true);
     const card = node.querySelector('.reward-card');
     const img = node.querySelector('img');
-    img.src = tokiImg(reward);
+    const imageUrl=tokiImg(reward);
+    img.src = imageUrl;
     img.alt = reward.name;
     const fallback=card.querySelector('.image-fallback');
-    img.hidden=false;
-    fallback.hidden=true;
+    img.hidden=!imageUrl;
+    fallback.hidden=!!imageUrl;
     img.onload=()=>{img.hidden=false;fallback.hidden=true;};
     img.onerror=()=>{img.hidden=true;fallback.hidden=false;};
     card.querySelector('.category').textContent = reward.category||'Reward';

@@ -787,6 +787,9 @@ const SCREENSHOT_CATALOG = [
 const defaultCatalogCampaign=APP_CONFIG.campaigns.find(c=>c.id==='upgrade-pk-aug');
 /* Catalog images remain empty until high-resolution supplier assets are added. */
 const CATALOG_IMAGE_OVERRIDES={};
+/* Keep the original Toki notebook artwork only on the notebook rewards. */
+['catalog-13-01','catalog-13-02','catalog-13-03','catalog-13-04','catalog-13-05','catalog-13-06','catalog-14-01','catalog-14-02','catalog-14-03','catalog-14-04','catalog-14-05','catalog-14-06']
+  .forEach(id=>{ CATALOG_IMAGE_OVERRIDES[id]='assets/rewards/notebook.jpg'; });
 if(defaultCatalogCampaign){
   defaultCatalogCampaign.rewards=defaultCatalogCampaign.rewards||[];
   SCREENSHOT_CATALOG.forEach(([shot,category,names,prices])=>names.forEach((name,index)=>{

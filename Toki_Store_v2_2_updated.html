@@ -785,11 +785,20 @@ const SCREENSHOT_CATALOG = [
   ['14','Stationery',['Mintra Hardcover Notebook B5','Mintra Hardcover Notebook B6','Mintra Notebook 24 Sheets – Random','Notte Hardcover A4 Sketchbook','Notte Hardcover A5 Sketchbook','Notte Large A4 Drawing Pad'],[79,445,31,718,434,91]]
 ];
 const defaultCatalogCampaign=APP_CONFIG.campaigns.find(c=>c.id==='upgrade-pk-aug');
+/* Verified web product photography for exact catalog matches. Other items retain
+   their individually cropped source image until an exact supplier image is confirmed. */
+const CATALOG_IMAGE_OVERRIDES={
+  'catalog-01-02':'https://cdn.shopify.com/s/files/1/0221/2572/products/61ivXL03caL._SL1000.jpg?v=1571438648',
+  'catalog-01-03':'https://www.watsons.ae/cdn/shop/files/ASW200002853_101.jpg?v=1771570199',
+  'catalog-01-04':'https://cdn.shopify.com/s/files/1/0818/2657/products/original_b86e7554-fa7e-4e27-962c-092553030102.jpg?v=1539563478&width=800',
+  'catalog-01-05':'https://www.mismarsanalmarket.com/UserFiles/Fotograflar/2530-4005808430208-jpg-4005808430208.jpg',
+  'catalog-01-06':'https://lanalou.me/cdn/shop/files/NewTRUEwebsiteproductimages_8_2048x.png?v=1753948381'
+};
 if(defaultCatalogCampaign){
   defaultCatalogCampaign.rewards=defaultCatalogCampaign.rewards||[];
   SCREENSHOT_CATALOG.forEach(([shot,category,names,prices])=>names.forEach((name,index)=>{
     const id='catalog-'+shot+'-'+String(index+1).padStart(2,'0');
-    if(!defaultCatalogCampaign.rewards.some(existing=>existing.id===id)) defaultCatalogCampaign.rewards.push({id,name,description:'Catalog reward · price includes 50 EGP.',points:Number(prices[index])+50,category,hidden:false,image:'assets/rewards/catalog/items/'+id+'.png',stock:null});
+    if(!defaultCatalogCampaign.rewards.some(existing=>existing.id===id)) defaultCatalogCampaign.rewards.push({id,name,description:'Catalog reward · price includes 50 EGP.',points:Number(prices[index])+50,category,hidden:false,image:CATALOG_IMAGE_OVERRIDES[id]||'assets/rewards/catalog/items/'+id+'.png',stock:null});
   }));
 }
 

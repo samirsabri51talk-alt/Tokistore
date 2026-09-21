@@ -789,7 +789,7 @@ if(defaultCatalogCampaign){
   defaultCatalogCampaign.rewards=defaultCatalogCampaign.rewards||[];
   SCREENSHOT_CATALOG.forEach(([shot,category,names,prices])=>names.forEach((name,index)=>{
     const id='catalog-'+shot+'-'+String(index+1).padStart(2,'0');
-    if(!defaultCatalogCampaign.rewards.some(existing=>existing.id===id)) defaultCatalogCampaign.rewards.push({id,name,description:'Catalog reward · price includes 50 EGP.',points:Number(prices[index])+50,category,hidden:false,image:'assets/rewards/catalog/catalog-'+shot+'.png',stock:null});
+    if(!defaultCatalogCampaign.rewards.some(existing=>existing.id===id)) defaultCatalogCampaign.rewards.push({id,name,description:'Catalog reward · price includes 50 EGP.',points:Number(prices[index])+50,category,hidden:false,image:'assets/rewards/catalog/items/'+id+'.png',stock:null});
   }));
 }
 
